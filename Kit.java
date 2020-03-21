@@ -2,7 +2,7 @@ public class Kit {
 	private double scopeOffset;
 	private int zeroDistance;
 	private String name;
-	private String caliber; //This will compare to the caliber of the selected bullet to ensure they match, also switch this to refer to an array
+	//private int caliber;
 	
 	public Kit() {
 		scopeOffset = 0;
