@@ -27,7 +27,7 @@ public class test {
 		int t = 1; //Counting 1 second at a time, for testing
   		double d = 0; //Distance traveled
  		s = (m*t) + (g/2)*(t*t);
-		d = a9.getVelocity() * t;
+		d = a308.getVelocity() * t;
 		System.out.println("Bullet Drop after " + t + " Second: " + df.format(s) + " Inches");
 		System.out.println("Bullet Distance after " + t + " Second: " + df.format(d/3) + " Yards");
 		
