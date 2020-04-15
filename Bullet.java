@@ -1,31 +1,31 @@
-public class Kit {
-	private double scopeOffset;
-	private int zeroDistance;
+public class Bullet {
+	private double mass;
+	private double velocity;
 	private String name;
 	private String caliber;
 
-	public Kit() {
-		scopeOffset = 0;
-		zeroDistance = 0;
+	public Bullet() {
+		mass = 0;
+		velocity = 0;
 	}
 
-	public Kit(double s, int z, String n, String c) {
-		setSpecs(s, z, n, c);
+	public Bullet(double m, double v, String n, String c) {
+		setSpecs(m, v, n, c);
 	}
 
-	public void setSpecs(double s, int z, String n, String c) {
-		scopeOffset = s;
-		zeroDistance = z;
+	public void setSpecs(double m, double v, String n, String c) {
+		mass = m;
+		velocity = v;
 		name = n;
 		caliber = c;
 	}
 
-	public double getOffset() {
-		return scopeOffset;
+	public double getMass() {
+		return mass;
 	}
 
-	public int getZero() {
-		return zeroDistance;
+	public double getVelocity() {
+		return velocity;
 	}
 
 	public String getName() {
@@ -34,5 +34,10 @@ public class Kit {
 
 	public String getCaliber() {
 		return caliber;
+	}
+
+	/* This calculates muzzle energy using mass and velocity from the cartridge */
+	public double muzzleEnergy() {
+		return (mass * velocity * velocity) / (64.32 * 7000);
 	}
 }
