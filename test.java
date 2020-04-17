@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import javax.swing.*;
+//Josh Wulfekuhle, James Kriefall, Brandon Welch, Kevin Gergen
 
 //S = VoT + 1/2 A ( T x T )
 public class test extends JFrame {
