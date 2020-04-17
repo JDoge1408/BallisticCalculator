@@ -1,12 +1,26 @@
-import java.awt.*;
-import java.math.*;
+import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Scanner;
+
 import javax.swing.*;
-import java.awt.event.*;
 
 //S = VoT + 1/2 A ( T x T )
 public class test extends JFrame {
+
+	// arraylists to pass arraylists from bullet and kit classes to
+	static ArrayList<String> bulletNames = new ArrayList<String>();
+
+	static ArrayList<String> kitNames = new ArrayList<String>();
+
+	// arrays for storing information to give to comboboxes
+	String[] bulletArray = bulletNames.toArray(new String[bulletNames.size()]);
+	String[] kitArray = kitNames.toArray(new String[kitNames.size()]);
+
+	public int kitChoice;
+	public int bulletChoice;
 
 	// variables for constructing main GUI
 	private JLabel lblKit;
@@ -16,27 +30,11 @@ public class test extends JFrame {
 	private JButton btnCalculate;
 	private JComboBox cboKit;
 	private JComboBox cboBullet;
-	
-	double td = 0; // Time to reach a designated distance
-	double s = 0; // Bullet Drop
-	double m = 0; // Angle of barrel mom/moa/mil
-	double g = 9.81; // Gravity coefficient
-	int[] Distances = { 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000 };
-	String[] Calibers = { "7.62x39", "7.62 NATO", "22lr", "17hmr" }; // List of possible calibers
-	DecimalFormat df = new DecimalFormat("0.00");
-
-	// String arrays for information from the dialog boxes "New Kit" and "New
-	// Bullet"
-	// Set the strings currently as option1", "option2", "option3. You may delete
-	// these
-	// strings and import the information needed.
-	String[] kit_dialog = { "option1", "option2", "option3" };
-	String[] bullet_dialog = { "option1", "option2", "option3" };
 
 	// Main GUI Constructor
 	public test() {
 		setTitle("Ballistic Calculator");
-		setSize(640, 480);
+		setSize(496, 239);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Panel that is empty to add content
@@ -46,79 +44,195 @@ public class test extends JFrame {
 
 		// Labels for "Kits" and "Bullets"
 		JLabel lblKit = new JLabel("Kits");
-		lblKit.setBounds(0, 0, 50, 50);
+		lblKit.setBounds(10, 0, 50, 50);
 		panel.add(lblKit);
 		JLabel lblBullet = new JLabel("Bullets");
-		lblBullet.setBounds(0, 50, 50, 50);
+		lblBullet.setBounds(10, 50, 50, 50);
 		panel.add(lblBullet);
 
 		// Buttons for "New Kit", "New Bullet", and "Calculate"
 		JButton btnNewKit = new JButton("New Kit");
-		btnNewKit.setBounds(0, 100, 100, 100);
+		btnNewKit.setBounds(0, 100, 120, 100);
+		btnNewKit.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				try {
+					btnNewKitActionPerformed(evt);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			private void btnNewKitActionPerformed(ActionEvent evt) throws IOException {
+				newKit();
+				dispose();
+			}
+		});
 		panel.add(btnNewKit);
-		JButton newBullet = new JButton("New Bullet");
-		newBullet.setBounds(540, 100, 100, 100);
-		panel.add(newBullet);
+
+		JButton btnNewBullet = new JButton("New Bullet");
+		btnNewBullet.setBounds(360, 100, 120, 100);
+		btnNewBullet.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				try {
+					btnNewBulletActionPerformed(evt);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			private void btnNewBulletActionPerformed(ActionEvent evt) throws IOException {
+				newBullet();
+				dispose();
+			}
+		});
+		panel.add(btnNewBullet);
 		JButton btnCalculate = new JButton("Calculate");
-		btnCalculate.setBounds(220, 100, 200, 100);
+		btnCalculate.setBounds(120, 100, 240, 100);
+		btnCalculate.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				try {
+					btnCalculateActionPerformed(evt);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			private void btnCalculateActionPerformed(ActionEvent evt) throws FileNotFoundException {
+                // TODO Auto-generated method stub
+                Kit k = new Kit();
+                k.updateLists();
+                k.setSpecs(kitChoice);
+                Bullet b = new Bullet();
+                b.updateLists();
+                b.setSpecs(bulletChoice);
+                calculate(k,b);
+            }
+		});
 		panel.add(btnCalculate);
 
 		// Combo Boxes for Kit and Bullet
 		// Grabs information from the string array
-		JComboBox cboKit = new JComboBox(kit_dialog);
+		JComboBox cboKit = new JComboBox(kitArray);
 		cboKit.setSelectedIndex(0);
-		cboKit.setBounds(100, 0, 540, 50);
+		cboKit.setBounds(80, 0, 380, 50);
+
+		cboKit.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				// cboKitActionPerformed(evt);
+				// creates a new kit so methods can be used
+				Kit kitHolder = new Kit();
+				try {
+					// updates the variables that will fill the
+					kitHolder.updateLists();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// stores the choice of kit to use with ArrayLists
+				kitChoice = cboKit.getSelectedIndex();
+			}
+		});
 		panel.add(cboKit);
-		JComboBox cboBullet = new JComboBox(bullet_dialog);
+
+		JComboBox cboBullet = new JComboBox(bulletArray);
 		cboBullet.setSelectedIndex(0);
-		cboBullet.setBounds(100, 50, 540, 50);
+		cboBullet.setBounds(80, 50, 380, 50);
+		cboBullet.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				// cboBulletActionPerformed(evt);
+
+				// creates new bullet to use methods
+				Bullet bulletHolder = new Bullet();
+				try {
+					// updates the lists so the information is accurate
+					bulletHolder.updateLists();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// stores the choice of bullet to use with ArrayLists
+				bulletChoice = cboBullet.getSelectedIndex();
+			}
+		});
 		panel.add(cboBullet);
 
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
-
-		// new test() calls to the main GUI constructor created
-		new test();
-
-		/* Find another way to store this information */
-		Bullet a308 = new Bullet(147, 2750, "Magtech M80 Ball", "7.62 NATO");
-		Kit kit1 = new Kit(2.1, 100, "Ruger American Predator", "7.62 NATO");
-
-		/*
-		 * Give information about the gun and cartridge to ensure information is
-		 * selected correctly
-		 */
-		System.out.println(
-				"The Muzzle Energy of " + a308.getName() + " is " + df.format(a308.muzzleEnergy()) + " ft-lbs");
-		System.out.println("You are shooting out of a " + kit1.getName());
-		System.out.println("Zeroed at " + kit1.getZero() + " Yards");
-		System.out.println("With a Scope Offset of " + kit1.getOffset() + " Inches");
-
-		int t = 1; // Counting 1 second at a time, for testing
-		double d = 0; // Distance traveled
-		s = (m * t) + (g / 2) * (t * t);
-		// originally: d = a9.getVelocity() * t;
-		d = a308.getVelocity() * t;
-		System.out.println("Bullet Drop after " + t + " Second: " + df.format(s) + " Inches");
-		System.out.println("Bullet Distance after " + t + " Second: " + df.format(d / 3) + " Yards");
-
-		int i = 0;
-		while (i < 5) {
-			t++;
-			s = (m * t) + (g / 2) * (t * t);
-			d = a308.getVelocity() * t;
-			System.out.println("Bullet Drop after " + t + " Seconds: " + df.format(s) + " Inches");
-			System.out.println("Bullet Distance after " + t + " Seconds: " + df.format(d / 3) + " Yards");
-			i++;
-		}
+	// moved stuff from main to a new method that can be used when the calculate button is pressed.
+	public void calculate(Kit kit, Bullet bullet) {
+		double td = 0; // Time to reach a designated distance
+		double s = 0; // Bullet Drop
+		double m = 0; // Angle of barrel mom/moa/mil UNUSED
+		double g = 9.81; // Gravity coefficient
+		int[] Distances = { 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000 };
+		DecimalFormat df = new DecimalFormat("0.00");
+		
+		String[] calcinfo = new String[4];
+		calcinfo[0] = "The Muzzle Energy of " + bullet.getName() + " is " + df.format(bullet.muzzleEnergy()) + " ft-lbs";
+		calcinfo[1] = "\nYou are shooting out of a " + kit.getName() + "";
+		calcinfo[2] = "\nZeroed at " + kit.getZero() + " Yards";
+		calcinfo[3] = "\nWith a Scope Offset of " + kit.getOffset() + " Inches";
 
 		/* (Distance/(Velocity/3)) = Time to reach distance */
+		String printlns = "";
 		for (int j = 0; j < Distances.length; j++) {
-			td = (Distances[j] / (a308.getVelocity() / 3));
+			td = (Distances[j] / (bullet.getVelocity() / 3));
 			s = (m * td) + (g / 2) * (td * td);
-			System.out.println("Bullet Drop at " + Distances[j] + " Yards: " + df.format(s) + " Inches");
+			printlns = printlns + "\nBullet Drop at " + Distances[j] + " Yards: " + df.format(s) + " Inches";
 		}
+		
+		JOptionPane.showMessageDialog(null, calcinfo[0] + calcinfo[1] + calcinfo[2] + calcinfo[3] + printlns, "Calculations", JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	public void newKit() throws IOException {
+        String kn; //kit name
+        String kz; //kit zero distance
+        String ks; //kit scope offset
+
+       kn = JOptionPane.showInputDialog("What is the name of the kit?");
+
+       kz = JOptionPane.showInputDialog("What is the zero distance?");
+       int kz2 = Integer.parseInt(kz);
+
+       ks = JOptionPane.showInputDialog("What is the scope offset?");
+       Double ks2 = Double.parseDouble(ks);
+
+       Kit k = new Kit(ks2, kz2, kn);
+       k.updateLists();
+       main(null);
+	}
+
+	public void newBullet() throws IOException {
+        String bn; //bullet name
+        String bv; //bullet velocity
+        String bm; //bullet mass
+
+       bn = JOptionPane.showInputDialog("What is the name of the bullet?");
+
+       bv = JOptionPane.showInputDialog("What is the velocity of the bullet?");
+       Double bv2 = Double.parseDouble(bv);
+
+       bm = JOptionPane.showInputDialog("What is the mass of the bullet?");
+       Double bm2 = Double.parseDouble(bm);
+
+       Bullet b = new Bullet(bm2, bv2, bn);
+       b.updateLists();
+       main(null);
+	}
+	
+	public static void main(String[] args) throws IOException {
+
+		/* Find another way to store this information */
+		Bullet b = new Bullet();
+		Kit k = new Kit();
+		b.updateLists();
+		k.updateLists();
+		bulletNames = b.getNames();
+		kitNames = k.getNames();
+		new test();
 	}
 }
